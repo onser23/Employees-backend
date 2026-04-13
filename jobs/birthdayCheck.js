@@ -12,12 +12,10 @@ const initBirthdayCheck = () => {
   );
   console.log("📧 Bildirişlər gedəcək: samadsada.de@gmail.com");
 
+  // cron.schedule('* * * * *', async () => {
   cron.schedule(
-    "* * * * *",
+    "0 9 * * *",
     async () => {
-      // cron.schedule(
-      //   "0 9 * * *",
-      //   async () => {
       console.log("✅ Doğum günü yoxlanışı başladı...", new Date().toString());
 
       try {
