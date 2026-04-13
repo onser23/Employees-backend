@@ -29,7 +29,7 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.options("*", cors());
+// app.options("*", cors());
 
 // Routes
 app.use("/api/auth", authRoutes);
