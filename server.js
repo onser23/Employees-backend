@@ -5,8 +5,6 @@ const connectDB = require("./config/db");
 const employeeRoutes = require("./routes/employees");
 const initBirthdayCheck = require("./jobs/birthdayCheck");
 const authRoutes = require("./routes/auth");
-// sonradan
-const cors = require("cors");
 
 // Environment variables
 dotenv.config();
