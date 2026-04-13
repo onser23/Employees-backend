@@ -5,6 +5,9 @@ const connectDB = require("./config/db");
 const employeeRoutes = require("./routes/employees");
 const initBirthdayCheck = require("./jobs/birthdayCheck");
 const authRoutes = require("./routes/auth");
+// sonradan
+const cors = require("cors");
+
 // Environment variables
 dotenv.config();
 
@@ -14,8 +17,16 @@ connectDB();
 const app = express();
 
 // Middleware
-app.use(cors());
+// app.use(cors());
 app.use(express.json());
+
+app.use(
+  cors({
+    origin: "https://employees-frontend-ecru.vercel.app",
+  }),
+);
+
+app.options("*", cors());
 
 // Routes
 app.use("/api/auth", authRoutes);
