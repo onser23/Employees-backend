@@ -17,7 +17,6 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
-
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
@@ -26,8 +25,6 @@ app.use(function (req, res, next) {
   );
   next();
 });
-
-// app.options("*", cors());
 
 // Routes
 app.use("/api/auth", authRoutes);
