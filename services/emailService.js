@@ -16,7 +16,6 @@ const ADMIN_EMAIL = "samadsada.de@gmail.com";
 
 // Doğum günü bildirişi göndər (yalnız adminə)
 const sendBirthdayNotification = async (birthdayEmployee, allEmployees) => {
-  console.log("SSSSSSSSSS", allEmployees);
   // Bugünün tarixini formatla
   const today = new Date();
   const formattedDate = today.toLocaleDateString("az-AZ", {
