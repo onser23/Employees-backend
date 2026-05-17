@@ -1,11 +1,15 @@
 const express = require("express");
 const router = express.Router();
 const Employee = require("../models/Employee");
+const authMiddleware = require("../middleware/auth");
+
+// Bütün routelara auth tələb et
+router.use(authMiddleware);
 
 // Bütün işçiləri gətir
 router.get("/", async (req, res) => {
   try {
-    const employees = await Employee.find().sort({ createdAt: -1 });
+    const employees = await Employee.find().select("-password");
     res.json({
       success: true,
       count: employees.length,
@@ -23,7 +27,7 @@ router.get("/", async (req, res) => {
 // Tək işçini gətir
 router.get("/:id", async (req, res) => {
   try {
-    const employee = await Employee.findById(req.params.id);
+    const employee = await Employee.findById(req.params.id).select("-password");
     if (!employee) {
       return res.status(404).json({
         success: false,
@@ -43,11 +47,27 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// Yeni işçi əlavə et
+// Yeni işçi əlavə et (password ilə)
 router.post("/", async (req, res) => {
   try {
-    const { firstName, lastName, birthDate, position, department, email } =
-      req.body;
+    const {
+      firstName,
+      lastName,
+      birthDate,
+      position,
+      department,
+      email,
+      password,
+    } = req.body;
+
+    // Email unikallığını yoxla
+    const existingEmployee = await Employee.findOne({ email });
+    if (existingEmployee) {
+      return res.status(400).json({
+        success: false,
+        message: "Bu email ilə işçi artıq mövcuddur",
+      });
+    }
 
     const employee = await Employee.create({
       firstName,
@@ -56,12 +76,20 @@ router.post("/", async (req, res) => {
       position,
       department,
       email,
+      password,
     });
 
     res.status(201).json({
       success: true,
       message: "İşçi uğurla əlavə edildi",
-      data: employee,
+      data: {
+        id: employee._id,
+        firstName: employee.firstName,
+        lastName: employee.lastName,
+        email: employee.email,
+        position: employee.position,
+        department: employee.department,
+      },
     });
   } catch (error) {
     res.status(400).json({
@@ -75,14 +103,35 @@ router.post("/", async (req, res) => {
 // İşçini yenilə
 router.put("/:id", async (req, res) => {
   try {
-    const { firstName, lastName, birthDate, position, department, email } =
-      req.body;
+    const {
+      firstName,
+      lastName,
+      birthDate,
+      position,
+      department,
+      email,
+      password,
+    } = req.body;
+
+    const updateData = {
+      firstName,
+      lastName,
+      birthDate,
+      position,
+      department,
+      email,
+    };
+
+    // Əgər şifrə göndərilibsə, onu da yenilə
+    if (password && password.length >= 6) {
+      updateData.password = password;
+    }
 
     const employee = await Employee.findByIdAndUpdate(
       req.params.id,
-      { firstName, lastName, birthDate, position, department, email },
+      updateData,
       { new: true, runValidators: true },
-    );
+    ).select("-password");
 
     if (!employee) {
       return res.status(404).json({
