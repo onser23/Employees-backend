@@ -5,6 +5,44 @@ const authMiddleware = require("../middleware/auth");
 
 router.use(authMiddleware);
 
+// ✅ YENI: Unikal satıcıları gətir - MÜTLƏQ /:id-DƏN ƏVVƏL!
+router.get("/sellers/list", async (req, res) => {
+  try {
+    const sellers = await Sale.distinct("seller");
+
+    res.json({
+      success: true,
+      count: sellers.length,
+      data: sellers.sort(),
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Satıcıları yükləyərkən xəta",
+      error: error.message,
+    });
+  }
+});
+
+// ✅ YENI: Unikal alıcıları gətir - /:id-dən əvvəl!
+router.get("/buyers/list", async (req, res) => {
+  try {
+    const buyers = await Sale.distinct("buyer");
+
+    res.json({
+      success: true,
+      count: buyers.length,
+      data: buyers.sort(),
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Alıcıları yükləyərkən xəta",
+      error: error.message,
+    });
+  }
+});
+
 // Bütün satışları gətir (filter ilə)
 router.get("/", async (req, res) => {
   try {

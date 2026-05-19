@@ -5,6 +5,97 @@ const authMiddleware = require("../middleware/auth");
 
 router.use(authMiddleware);
 
+// ✅ YENI: Unikal satıcıları gətir - MÜTLƏQ /:id-DƏN ƏVVƏL OLMALIDIR!
+router.get("/sellers/list", async (req, res) => {
+  try {
+    const sellers = await Income.distinct("seller");
+
+    res.json({
+      success: true,
+      count: sellers.length,
+      data: sellers.sort(),
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Satıcıları yükləyərkən xəta",
+      error: error.message,
+    });
+  }
+});
+
+// ✅ YENI: Unikal alıcıları gətir - /:id-dən əvvəl!
+router.get("/buyers/list", async (req, res) => {
+  try {
+    const buyers = await Income.distinct("buyer");
+
+    res.json({
+      success: true,
+      count: buyers.length,
+      data: buyers.sort(),
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Alıcıları yükləyərkən xəta",
+      error: error.message,
+    });
+  }
+});
+
+// Bütün gəlirləri gətir (filter ilə)
+router.get("/", async (req, res) => {
+  try {
+    const { startDate, endDate, buyer, seller, currency } = req.query;
+
+    let query = {};
+
+    if (startDate || endDate) {
+      query.date = {};
+      if (startDate) query.date.$gte = new Date(startDate);
+      if (endDate) query.date.$lte = new Date(endDate);
+    }
+
+    if (buyer) query.buyer = { $regex: buyer, $options: "i" };
+    if (seller) query.seller = { $regex: seller, $options: "i" };
+    if (currency) query.currency = currency;
+
+    const incomes = await Income.find(query).sort({ date: -1 });
+
+    res.json({
+      success: true,
+      count: incomes.length,
+      data: incomes,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Gəlirləri yükləyərkən xəta",
+      error: error.message,
+    });
+  }
+});
+
+// Tək gəlir gətir - BU SONRA OLMALIDIR!
+router.get("/:id", async (req, res) => {
+  try {
+    const income = await Income.findById(req.params.id);
+    if (!income) {
+      return res.status(404).json({
+        success: false,
+        message: "Gəlir tapılmadı",
+      });
+    }
+    res.json({ success: true, data: income });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Xəta baş verdi",
+      error: error.message,
+    });
+  }
+});
+
 // Bütün gəlirləri gətir (filter ilə)
 router.get("/", async (req, res) => {
   try {
