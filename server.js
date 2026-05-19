@@ -6,6 +6,8 @@ const authRoutes = require("./routes/auth");
 const userAuthRoutes = require("./routes/userAuth"); // YENI
 const employeeRoutes = require("./routes/employees");
 const initBirthdayCheck = require("./jobs/birthdayCheck");
+const salesRoutes = require("./routes/sales");
+const incomesRoutes = require("./routes/incomes");
 
 // Environment variables
 dotenv.config();
@@ -31,6 +33,11 @@ app.use(function (req, res, next) {
 app.use("/api/auth", authRoutes);
 app.use("/api/user-auth", userAuthRoutes);
 app.use("/api/employees", employeeRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/user-auth", userAuthRoutes);
+app.use("/api/employees", employeeRoutes);
+app.use("/api/sales", salesRoutes); // YENI
+app.use("/api/incomes", incomesRoutes); // YENI
 
 // Health check
 app.get("/api/health", (req, res) => {
